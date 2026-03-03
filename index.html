@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yachana Aryal — ML Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1117;
+    --surface: #111820;
+    --surface2: #161e28;
+    --border: #1e2d3d;
+    --accent: #4af0b8;
+    --accent2: #3dd9ff;
+    --accent3: #f0a84a;
+    --text: #e8edf2;
+    --text2: #8a9bb0;
+    --text3: #4a6278;
+    --glow: rgba(74, 240, 184, 0.12);
+    --glow2: rgba(61, 217, 255, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Canvas background ── */
+  #neural-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(8, 12, 16, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── Sections ── */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── Hero ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 0 6rem;
+  }
+
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-tag::before {
+    content: '//';
+    margin-right: 0.5rem;
+    color: var(--text3);
+  }
+
+  h1.hero-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  h1.hero-name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    color: var(--text2);
+    letter-spacing: 0.08em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-desc {
+    max-width: 540px;
+    color: var(--text2);
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.75;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 0.25s;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #080c10;
+  }
+
+  .btn-primary:hover {
+    background: #6fffd4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(74, 240, 184, 0.3);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+
+  /* ── Section headers ── */
+  .section-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-tag::before { content: '// '; color: var(--text3); }
+
+  h2.section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h2.section-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* ── About ── */
+  #about {
+    padding: 7rem 0;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .about-text p {
+    color: var(--text2);
+    font-weight: 300;
+    line-height: 1.8;
+    margin-bottom: 1.2rem;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .skill-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.6rem 0.9rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .skill-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--glow);
+  }
+
+  .skill-chip.highlight {
+    border-color: rgba(74, 240, 184, 0.3);
+    color: var(--accent);
+    background: rgba(74, 240, 184, 0.05);
+  }
+
+  /* ── Experience ── */
+  #experience {
+    padding: 7rem 0;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--border) 60%, transparent 100%);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 0 0 3rem 2.5rem;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -0.35rem;
+    top: 0.4rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .timeline-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline-role {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .timeline-company {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+
+  .timeline-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .timeline-bullets li {
+    color: var(--text2);
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .timeline-bullets li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  /* ── Projects ── */
+  #projects {
+    padding: 7rem 0;
+    background: var(--bg2);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .project-card:hover {
+    border-color: rgba(74, 240, 184, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 40px var(--glow);
+  }
+
+  .project-card:hover::before { transform: scaleX(1); }
+
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .project-icon {
+    font-size: 1.5rem;
+  }
+
+  .project-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .project-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text3);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .project-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .project-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+
+  .project-desc {
+    font-size: 0.875rem;
+    color: var(--text2);
+    font-weight: 300;
+    line-height: 1.65;
+    margin-bottom: 1.2rem;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent2);
+    background: rgba(61, 217, 255, 0.07);
+    border: 1px solid rgba(61, 217, 255, 0.2);
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Blog ── */
+  #blog {
+    padding: 7rem 0;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .blog-card:hover {
+    border-color: rgba(240, 168, 74, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  }
+
+  .blog-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .blog-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .blog-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+  }
+
+  .blog-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .blog-excerpt {
+    font-size: 0.875rem;
+    color: var(--text2);
+    font-weight: 300;
+    line-height: 1.65;
+    flex: 1;
+  }
+
+  .blog-read-more {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .blog-add-card {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 200px;
+  }
+
+  .blog-add-card:hover {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .blog-add-card .add-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .blog-add-card span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Contact ── */
+  #contact {
+    padding: 7rem 0;
+    background: var(--bg2);
+  }
+
+  .contact-inner {
+    max-width: 640px;
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text2);
+    transition: all 0.2s;
+  }
+
+  .contact-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .contact-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .contact-value {
+    font-size: 0.9rem;
+  }
+
+  /* ── Footer ── */
+  footer {
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text3);
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .hero-stats { gap: 2rem; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">ya.aryal</div>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#blog">blog</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-inner">
+    <p class="hero-tag">ML Engineer · NLP Specialist</p>
+    <h1 class="hero-name">Yachana<br><em>Aryal</em></h1>
+    <p class="hero-title">Machine Learning · Deep Learning · NLP · MLOps</p>
+    <p class="hero-desc">
+      Building intelligent systems at the intersection of language and data.
+      Specialized in LLMs, NLP for low-resource languages, and end-to-end
+      ML pipelines — from research to production.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects →</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      <a href="https://github.com/" target="_blank" class="btn btn-outline">GitHub ↗</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">4+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div>
+        <div class="stat-num">8+</div>
+        <div class="stat-label">ML Projects</div>
+      </div>
+      <div>
+        <div class="stat-num">3.7</div>
+        <div class="stat-label">CGPA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <div class="section-header">
+          <p class="section-tag">About Me</p>
+          <h2 class="section-title">Building models that<br><em>understand language</em></h2>
+        </div>
+        <p>
+          ML Engineer with 4+ years of experience designing and deploying NLP and deep learning systems.
+          Currently focused on LLM applications, retrieval-augmented generation, and document AI.
+        </p>
+        <p>
+          Previously at TAI Inc., collaborating with Nomura Research Institute, Japan — building ML pipelines
+          on Amazon SageMaker with graph databases and large-scale search infrastructure.
+        </p>
+        <p>
+          Passionate about low-resource NLP, particularly for Nepali language — having built production-grade
+          NER, classification, and recommendation systems from scratch.
+        </p>
+        <br>
+        <a href="mailto:yachhna@gmail.com" class="btn btn-outline" style="display:inline-flex;">
+          📄 Download Resume
+        </a>
+      </div>
+      <div class="reveal" style="animation-delay:0.2s">
+        <p class="section-tag" style="margin-bottom:1.25rem">Tech Stack</p>
+        <div class="skills-grid">
+          <div class="skill-chip highlight">PyTorch</div>
+          <div class="skill-chip highlight">Transformers / BERT</div>
+          <div class="skill-chip highlight">LangChain + RAG</div>
+          <div class="skill-chip highlight">Amazon SageMaker</div>
+          <div class="skill-chip">Scikit-learn</div>
+          <div class="skill-chip">Pandas / NumPy</div>
+          <div class="skill-chip">NLTK · SpaCy</div>
+          <div class="skill-chip">PaddleOCR</div>
+          <div class="skill-chip">Neo4j</div>
+          <div class="skill-chip">Elasticsearch</div>
+          <div class="skill-chip">Docker · AWS</div>
+          <div class="skill-chip">Jenkins CI/CD</div>
+          <div class="skill-chip">Pinecone</div>
+          <div class="skill-chip">MySQL · MongoDB</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Experience -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">Experience</p>
+      <h2 class="section-title">Where I've <em>worked</em></h2>
+    </div>
+    <div class="timeline reveal">
+
+      <div class="timeline-item">
+        <div class="timeline-period">Jun 2023 — Nov 2025</div>
+        <div class="timeline-role">ML Engineer</div>
+        <div class="timeline-company">TAI Inc. · Kathmandu (w/ Nomura Research Institute, Japan)</div>
+        <ul class="timeline-bullets">
+          <li>Developed LLM-powered applications for data analysis and insights in collaboration with NRI Japan.</li>
+          <li>Built and deployed ML pipelines on Amazon SageMaker; used Neo4j for relationship modelling and Elasticsearch for large-scale data handling.</li>
+          <li>Implemented CI/CD pipelines with Jenkins for NLP model deployment and lifecycle management.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-period">Dec 2020 — Jan 2023</div>
+        <div class="timeline-role">NLP Engineer</div>
+        <div class="timeline-company">EKbana Solutions · Lalitpur</div>
+        <ul class="timeline-bullets">
+          <li>Designed and deployed NLP models for research and commercial use, including low-resource Nepali language systems.</li>
+          <li>Preprocessed large-scale text and image datasets; collaborated across teams on end-to-end NLP solutions.</li>
+          <li>Implemented evaluation frameworks for iterative model refinement.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-period">Oct 2023</div>
+        <div class="timeline-role">NLP/ML Instructor</div>
+        <div class="timeline-company">IIMS · Kathmandu</div>
+        <ul class="timeline-bullets">
+          <li>Led workshops on NLP and Machine Learning for postgraduate and undergraduate students.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Projects -->
+<section id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">Projects</p>
+      <h2 class="section-title">Things I've <em>built</em></h2>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">🤖</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Nepali News Classification</div>
+        <div class="project-desc">Sentiment classification of Nepali news achieving ~89% accuracy by fine-tuning BERT. Implemented preprocessing techniques and data augmentation for low-resource language handling.</div>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">BERT</span><span class="tag">Oversampling</span><span class="tag">NLP</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">📰</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Nepali News Recommendation System</div>
+        <div class="project-desc">Content-based filtering for Nepali news using TF-IDF and cosine similarity. Increased user engagement by 20% through high coverage and diversity-aware recommendations.</div>
+        <div class="project-tags">
+          <span class="tag">TF-IDF</span><span class="tag">Cosine Similarity</span><span class="tag">Content-based</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">📄</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Invoice Information Extraction</div>
+        <div class="project-desc">Document AI pipeline using PaddleOCR, ResNet, and sentence transformers for cross-format document comparison. Built a similarity checker achieving 98% accuracy on image-based documents.</div>
+        <div class="project-tags">
+          <span class="tag">PaddleOCR</span><span class="tag">ResNet</span><span class="tag">Sentence Transformers</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">🔍</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Nepali Named Entity Recognition</div>
+        <div class="project-desc">NER system for Nepali text using CRF and custom preprocessing with POS tagging. Achieved 95% accuracy in entity extraction, enhancing Nepali text information retrieval.</div>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">CRF</span><span class="tag">POS Tagging</span><span class="tag">Low-resource NLP</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">💬</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Chat PDF (RAG Pipeline)</div>
+        <div class="project-desc">Retrieval-Augmented Generation pipeline using LangChain and Pinecone for real-time querying of large PDF corpora. Context-aware chunking and similarity search to minimise hallucinations.</div>
+        <div class="project-tags">
+          <span class="tag">LangChain</span><span class="tag">RAG</span><span class="tag">Pinecone</span><span class="tag">LLM</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">🦙</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Sentiment Classification with Llama 2 + LoRA</div>
+        <div class="project-desc">Parameter-efficient fine-tuning (PEFT) of Llama 2 via LoRA for sentiment classification. Optimised for high-accuracy inference in resource-constrained environments.</div>
+        <div class="project-tags">
+          <span class="tag">Llama 2</span><span class="tag">LoRA</span><span class="tag">PEFT</span><span class="tag">PyTorch</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">📑</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Automated Document Processing Agent</div>
+        <div class="project-desc">Document AI agent coordinating PaddleOCR, LayoutReader, and VLM tools via LangChain. Accurately extracts data from complex layouts including charts and tables.</div>
+        <div class="project-tags">
+          <span class="tag">PaddleOCR</span><span class="tag">VLM</span><span class="tag">LangChain</span><span class="tag">LayoutReader</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">🔤</div>
+          <div class="project-links">
+            <a href="https://github.com/" target="_blank" class="project-link" title="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="project-title">Next Word Prediction (Stacked LSTM)</div>
+        <div class="project-desc">LSTM-based next-word prediction with embedding layers, dropout regularisation, and Adam optimiser. Improved accuracy by leveraging multi-source context.</div>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">Stacked LSTM</span><span class="tag">Embeddings</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Blog -->
+<section id="blog">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">Blog</p>
+      <h2 class="section-title">Thoughts & <em>writings</em></h2>
+    </div>
+    <div class="blog-grid">
+
+      <a href="#" class="blog-card reveal">
+        <div class="blog-meta">
+          <span class="blog-category">NLP</span>
+          <span class="blog-date">Coming soon</span>
+        </div>
+        <div class="blog-title">Fine-tuning BERT for Low-Resource Nepali Text Classification</div>
+        <div class="blog-excerpt">Lessons learned building a sentiment classifier for Nepali news — data augmentation strategies, tokenisation challenges, and evaluation pitfalls.</div>
+        <div class="blog-read-more">Read more →</div>
+      </a>
+
+      <a href="#" class="blog-card reveal">
+        <div class="blog-meta">
+          <span class="blog-category">LLMs</span>
+          <span class="blog-date">Coming soon</span>
+        </div>
+        <div class="blog-title">RAG vs Fine-tuning: When to Use Which for Production NLP</div>
+        <div class="blog-excerpt">A practical guide to choosing between retrieval-augmented generation and fine-tuning based on data availability, latency, and cost constraints.</div>
+        <div class="blog-read-more">Read more →</div>
+      </a>
+
+      <a href="#" class="blog-card reveal">
+        <div class="blog-meta">
+          <span class="blog-category">MLOps</span>
+          <span class="blog-date">Coming soon</span>
+        </div>
+        <div class="blog-title">Deploying NLP Models with SageMaker and Jenkins CI/CD</div>
+        <div class="blog-excerpt">End-to-end walkthrough of deploying transformer models on AWS SageMaker with automated testing and continuous deployment pipelines.</div>
+        <div class="blog-read-more">Read more →</div>
+      </a>
+
+      <div class="blog-add-card reveal" onclick="alert('Add your blog URL here in the HTML!')">
+        <div class="add-icon">✍️</div>
+        <span>Add a new post</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-inner reveal">
+      <div class="section-header">
+        <p class="section-tag">Contact</p>
+        <h2 class="section-title">Let's <em>connect</em></h2>
+      </div>
+      <p style="color:var(--text2);font-weight:300;line-height:1.8;margin-bottom:0.5rem;">
+        Open to interesting ML/NLP opportunities, research collaborations, and conversations about language models and low-resource NLP.
+      </p>
+      <div class="contact-info">
+        <a href="mailto:yachhna@gmail.com" class="contact-item">
+          <span class="contact-label">email</span>
+          <span class="contact-value">yachhna@gmail.com</span>
+        </a>
+        <a href="tel:9846641719" class="contact-item">
+          <span class="contact-label">phone</span>
+          <span class="contact-value">+977 9846641719</span>
+        </a>
+        <a href="https://github.com/" target="_blank" class="contact-item">
+          <span class="contact-label">github</span>
+          <span class="contact-value">github.com/yachana-aryal</span>
+        </a>
+        <a href="https://linkedin.com/" target="_blank" class="contact-item">
+          <span class="contact-label">linkedin</span>
+          <span class="contact-value">linkedin.com/in/yachana-aryal</span>
+        </a>
+        <a href="#" class="contact-item">
+          <span class="contact-label">location</span>
+          <span class="contact-value">Kathmandu, Nepal</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Yachana Aryal · Built with HTML/CSS/JS · Hosted on GitHub Pages</p>
+</footer>
+
+<script>
+// ── Neural network canvas background ──
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+
+let nodes = [];
+const NODE_COUNT = 55;
+const MAX_DIST = 160;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function initNodes() {
+  nodes = [];
+  for (let i = 0; i < NODE_COUNT; i++) {
+    nodes.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 2 + 1,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function drawFrame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Update
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy; n.pulse += 0.015;
+    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+  });
+
+  // Edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < MAX_DIST) {
+        const alpha = (1 - dist / MAX_DIST) * 0.25;
+        ctx.strokeStyle = `rgba(74, 240, 184, ${alpha})`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Nodes
+  nodes.forEach(n => {
+    const glow = (Math.sin(n.pulse) + 1) / 2;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(74, 240, 184, ${0.4 + glow * 0.4})`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawFrame);
+}
+
+resize();
+initNodes();
+drawFrame();
+window.addEventListener('resize', () => { resize(); initNodes(); });
+
+// ── Scroll reveal ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
